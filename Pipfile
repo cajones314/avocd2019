@@ -5,12 +5,18 @@ verify_ssl = true
 
 [scripts]
 avocd = "python src/cli.py"
+tests = "python -m pytest"
 
 [dev-packages]
 pylint = "*"
+black = "*"
+pytest = "*"
 
 [packages]
 click = "*"
 
 [requires]
 python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true

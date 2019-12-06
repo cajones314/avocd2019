@@ -17,7 +17,7 @@ def cli(day: int, puzzle: int, input: str):
   avocd = DayFactory(day, input_stream)
 
   try:
-    avocd.run(puzzle)
+    print(avocd.run(puzzle))
   except NotImplementedError:
     print(f"Puzzle {puzzle} for day {day} not implemented.")
 

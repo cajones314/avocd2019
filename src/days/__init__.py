@@ -11,7 +11,6 @@ from .day import Day
 def DayFactory(day, input_file):
   #pylint: disable=no-member
   for cls in Day.__subclasses__():
-    print(f"classname: {cls.__name__}")
     if cls.__name__ == f"Day{day}":
       return cls(input_file)
 
