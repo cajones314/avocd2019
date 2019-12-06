@@ -6,7 +6,7 @@ It is recommended that you have `pyenv` and `pipenv` installed in order to run t
 
 ## How the code is organized
 
-Each day is contained within its on Class in the `days` folder.  The individual Days subclass the Base `Class Day`.  
+Each day is contained within its own Class in the `days` folder.  The individual Days subclass the Base `Class Day`.  
 
 The input data is stored in the folder: `data`
 
