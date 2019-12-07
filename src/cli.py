@@ -1,12 +1,20 @@
 # system
-import os
 from io import IOBase, StringIO
+import os
+
 
 # 3rd party
 import click
 
 # internal
 from days import DayFactory
+
+# import logging
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
+# ch = logging.StreamHandler()
+# logger.addHandler(ch)
+
 
 @click.group(invoke_without_command=True)
 @click.option('-d', '--day', required=True, type=click.IntRange(1, 31), metavar="<1..31>", help="Day you want to select.")
@@ -18,7 +26,6 @@ def cli(day: int, puzzle: int, input: str):
     input_stream = open(filename, "r")
   else:
     input_stream = StringIO('')
-
   avocd = DayFactory(day, input_stream)
 
   try:
