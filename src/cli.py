@@ -1,6 +1,6 @@
 # system
 import os
-from io import IOBase
+from io import IOBase, StringIO
 
 # 3rd party
 import click
@@ -13,7 +13,12 @@ from days import DayFactory
 @click.option('-p', '--puzzle', required=True, type=click.IntRange(1, 2), metavar="<1|2>", help="Puzzle you want to run.")
 @click.option('-i', '--input', required=True, type=click.Path(exists=True), help="Path to puzzle data.")
 def cli(day: int, puzzle: int, input: str):
-  input_stream = open(os.path.join(input, f"{day:02}_puzzle_{puzzle}.txt"), "r")
+  filename = os.path.join(input, f"{day:02}_puzzle_{puzzle}.txt")
+  if os.path.exists(filename):
+    input_stream = open(filename, "r")
+  else:
+    input_stream = StringIO('')
+
   avocd = DayFactory(day, input_stream)
 
   try:
