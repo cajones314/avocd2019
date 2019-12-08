@@ -5,7 +5,6 @@ from itertools import product
 
 # 3rd party
 import numpy as np 
-import click
 
 # internal
 from .day import Day
