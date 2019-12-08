@@ -1,16 +1,20 @@
 # system
 import math
 from collections import namedtuple, Counter
+from functools import reduce
 from pprint import pprint
-
+from typing import List, Dict, Tuple
 
 # 3rd party
-import numpy as np 
+import numpy as np
 
 # internal
 from .day import Day
 
 """
+===============================================================================
+Day 3 Puzzle 1
+
 The gravity assist was successful, and you're well on your way to the Venus
 refuelling station. During the rush back on Earth, the fuel management system
 wasn't completely installed, so that's next on the priority list.
@@ -68,51 +72,148 @@ U98,R91,D20,R16,D67,R40,U7,R15,U6,R7 =
 distance 135 
 
 What is the Manhattan distance from the central port to the closest intersection?
+
+===============================================================================
+Day 3 Puzzle 2
+
+It turns out that this circuit is very timing-sensitive; you actually need to
+minimize the signal delay.
+
+To do this, calculate the number of steps each wire takes to reach each
+intersection; choose the intersection where the sum of both wires' steps is
+lowest. If a wire visits a position on the grid multiple times, use the steps
+value from the first time it visits that position when calculating the total
+value of a specific intersection.
+
+The number of steps a wire takes is the total number of grid squares the wire
+has entered to get to that location, including the intersection being
+considered. Again consider the example from above:
+
+........... 
+.+-----+... 
+.|.....|... 
+.|..+--X-+. 
+.|..|..|.|. 
+.|.-X--+.|.
+.|..|....|. 
+.|.......|. 
+.o-------+. 
+........... 
+
+In the above example, the intersection closest to the central port is reached 
+after 8+5+5+2 = 20 steps by the first wire and 7+6+4+3 = 20 steps by the second 
+wire for a total of 20+20 = 40 steps.
+
+However, the top-right intersection is better: the first wire takes only 8+5+2
+= 15 and the second wire takes only 7+6+2 = 15, a total of 15+15 = 30 steps.
+
+Here are the best steps for the extra examples from above:
+
+R75,D30,R83,U83,L12,D49,R71,U7,L72 U62,R66,U55,R34,D71,R55,D58,R83 = 610 steps
+R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51
+U98,R91,D20,R16,D67,R40,U7,R15,U6,R7 = 410 steps What is the fewest combined
+steps the wires must take to reach an intersection?
 """
+
+Point = namedtuple("Point", ["x", "y", "dist"])
+
 
 class Day3(Day):
 
-    _moves = {
-        'R': ( 1, 0),
-        'L': (-1, 0),
-        'U': ( 0, 1),
-        'D': ( 0,-1)
-    }
-    
+    # changes in x & y based on direction
+    _moves = {"R": (1, 0), "L": (-1, 0), "U": (0, 1), "D": (0, -1)}
+
+    def _get_turns(self, path: str) -> List[Tuple[str, int]]:
+        path = path.rstrip("\n")
+        return [(turn[0], int(turn[1:])) for turn in path.split(",")]
+
+    def _get_points_from_turns(self, turns: List[Tuple[str, int]]) -> List[Point]:
+        points = []
+        point = Point(0, 0, 0)
+        for direction, length in turns:
+            x, y = self._moves[direction]
+            for _ in range(length):
+                nx = point.x + x
+                ny = point.y + y
+                # create a list of all points on the path
+                points.append(point := Point(nx, ny, abs(nx) + abs(ny)))
+
+        return points
+
+    def _get_intersection_points(self, wires) -> Dict:
+        return dict(filter(lambda item: item[1] > 1, wires.items()))
+
+    def _get_steps(self, point, steps):
+        return sum(map(lambda points: points.index(point) + 1, steps))
+
     def _puzzle1(self):
-        answer = ''
-        Point = namedtuple("Point", ["x", "y"])
+        answer = ""
+        # Point is a named tuple which stores the x, y and manhattan distance
+        # It is named so I can track in a dictionary using Counter from collections
         wires = Counter()
 
         # apparently pylint doesn't know about 3.8 iteralbes on streams
         # pylint: disable=not-an-iterable
-        for line in self._input_stream:
-            path  = line.rstrip("\n")
-            turns = [ (turn[0], int(turn[1:])) for turn in path.split(',') ] 
+        for path in self._input_stream:
+            # get turns from path
+            turns = self._get_turns(path)
 
-            points = {}
-            point = Point(0, 0)
-            for direction, length in turns:
-                x, y = self._moves[direction]
-                for _ in range(length):
-                    point = Point(point.x + x, point.y + y)
-                    # create a dictionary of all points.  Assignment is spurious
-                    points[point] = 1
-           
-            # for all unique points of the single wire add it to dict counter
-            for point in points.keys():
-                wires[point] += 1 
+            # get points on the path from turns
+            points = self._get_points_from_turns(turns)
 
+            # create a dict from the points assign a default value of 1. This will be added to
+            # the wires Counter, causing any crossin of unique points to increased by 1
+            wire = dict.fromkeys(points, 1)
+            wires.update(wire)
 
-        distances = []
-        for point, count in wires.items():
-            # any point with a count of two or higher has been crossed
-            if count > 1:
-                # Manhattan distance is the sum of the absolute differences of their Cartesian coordinates 
-                distances.append(abs(point.x) + abs(point.y))
+        # find all intersection of points on the wires, there value will be 2 if 2 wires cross
+        intersections = self._get_intersection_points(wires)
 
-        # if there are any  distances then we have an answer
-        if len(distances):
-            answer = str(min(distances))
- 
+        # reduce the dict to the Point with the shortest distance
+        shortest = reduce(
+            lambda shortest, point: shortest if shortest.dist < point.dist else point,
+            intersections.keys(),
+        )
+
+        answer = str(shortest.dist)
+
+        return answer
+
+    def _puzzle2(self):
+        answer = ""
+        # Point is a named tuple which stores the x, y and manhattan distance
+        # It is named so I can track in a dictionary using Counter from collections
+        wires = Counter()
+        steps = []
+
+        # apparently pylint doesn't know about 3.8 iteralbes on streams
+        # pylint: disable=not-an-iterable
+        for path in self._input_stream:
+            # get turns from path
+            turns = self._get_turns(path)
+
+            # get points on the path from turns
+            points = self._get_points_from_turns(turns)
+
+            # store points for step count
+            steps.append(points)
+
+            # create a dict from the points assign a default value of 1. This will be added to
+            # the wires Counter, causing any crossin of unique points to increased by 1
+            wire = dict.fromkeys(points, 1)
+            wires.update(wire)
+
+        # find all intersection of points on the wires, there value will be 2 if 2 wires cross
+        intersections = self._get_intersection_points(wires)
+
+        # reduce the dict to the Point with the closet steps
+        closest = reduce(
+            lambda closest, point: closest
+            if self._get_steps(closest, steps) < self._get_steps(point, steps)
+            else point,
+            intersections.keys(),
+        )
+
+        answer = str(self._get_steps(closest, steps))
+
         return answer
