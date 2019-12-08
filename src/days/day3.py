@@ -5,9 +5,6 @@ from functools import reduce
 from pprint import pprint
 from typing import List, Dict, Tuple
 
-# 3rd party
-import numpy as np
-
 # internal
 from .day import Day
 
