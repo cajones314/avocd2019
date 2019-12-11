@@ -159,11 +159,11 @@ class Day3(Day):
             points = self._get_points_from_turns(turns)
 
             # create a dict from the points assign a default value of 1. This will be added to
-            # the wires Counter, causing any crossin of unique points to increased by 1
+            # the wires Counter, causing any crossing of unique points to be increased by 1
             wire = dict.fromkeys(points, 1)
             wires.update(wire)
 
-        # find all intersection of points on the wires, there value will be 2 if 2 wires cross
+        # find all intersection of points on the wires, their value will be 2 if 2 wires cross
         intersections = self._get_intersection_points(wires)
 
         # reduce the dict to the Point with the shortest distance
@@ -196,11 +196,11 @@ class Day3(Day):
             steps.append(points)
 
             # create a dict from the points assign a default value of 1. This will be added to
-            # the wires Counter, causing any crossin of unique points to increased by 1
+            # the wires Counter, causing any crossing of unique points to be increased by 1
             wire = dict.fromkeys(points, 1)
             wires.update(wire)
 
-        # find all intersection of points on the wires, there value will be 2 if 2 wires cross
+        # find all intersection of points on the wires, their value will be 2 if 2 wires cross
         intersections = self._get_intersection_points(wires)
 
         # reduce the dict to the Point with the closet steps

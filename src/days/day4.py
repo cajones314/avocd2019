@@ -8,6 +8,7 @@ from .day import Day
 """
 ===============================================================================
 Day 4 Puzzle 1
+
 You arrive at the Venus fuel depot only to discover it's protected by a
 password. The Elves had written the password on a sticky note, but someone
 threw it out.
@@ -43,47 +44,50 @@ different passwords within the range given in your puzzle input meet all of the
 criteria?
 """
 
+
 class Day4(Day):
+    def _puzzle1(self):
+        possible = 0
 
-  def _puzzle1(self):
-    possible = 0
+        # loop through all possible password combinations
+        for password in range(137683, 596253):
+            parts = [int(c) for c in str(password)]
 
-    for password in range(137683, 596253):
-      parts = [int(c) for c in str(password)]
-      if parts[0] != min(parts):
-        continue
-      inorder = parts.copy()
-      inorder.sort()
+            # ensure password is in ascening order
+            inorder = parts.copy()
+            inorder.sort()
+            if parts != inorder:
+                continue
 
-      if parts != inorder:
-        continue
+            # ensure there is at least one double
+            if len(list(filter(lambda item: item[1] > 1, Counter(parts).items()))) == 0:
+                continue
 
-      if len(list(filter(lambda item: item[1] > 1, Counter(parts).items()))) == 0:
-        continue
+            possible += 1
 
-      possible += 1
-    
-    return str(possible)
+        return str(possible)
 
-  def _puzzle2(self):
-    possible = 0
+    def _puzzle2(self):
+        possible = 0
 
-    for password in range(137683, 596253):
-      parts = [int(c) for c in str(password)]
-      if parts[0] != min(parts):
-        continue
-      inorder = parts.copy()
-      inorder.sort()
+        # loop through all possible password combinations
+        for password in range(137683, 596253):
+            parts = [int(c) for c in str(password)]
 
-      if parts != inorder:
-        continue
+            # ensure password is in ascening order
+            inorder = parts.copy()
+            inorder.sort()
+            if parts != inorder:
+                continue
 
-      if len(list(filter(lambda item: item[1] == 2, Counter(parts).items()))) == 0:
-        continue
+            # ensure there is at least one double by itself
+            if (
+                len(list(filter(lambda item: item[1] == 2, Counter(parts).items())))
+                == 0
+            ):
+                continue
 
-      possible += 1
-    
-    return str(possible)
+            possible += 1
 
-
+        return str(possible)
 
