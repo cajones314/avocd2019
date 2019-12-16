@@ -164,7 +164,6 @@ diagnostic code.
 What is the diagnostic code for system ID 5?
 """
 
-
 class IntcodeComputer:
     # Program counter
     _pc = 0
